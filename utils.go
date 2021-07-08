@@ -335,6 +335,8 @@ func getCgroupDestination(subsystem string) (string, error) {
 	}
 	defer f.Close()
 	s := bufio.NewScanner(f)
+
+	field := ""
 	for s.Scan() {
 		fields := strings.Split(s.Text(), " ")
 		if len(fields) < 10 {
@@ -346,9 +348,12 @@ func getCgroupDestination(subsystem string) (string, error) {
 		}
 		for _, opt := range strings.Split(fields[len(fields)-1], ",") {
 			if opt == subsystem {
-				return fields[3], nil
+				field = fields[3]
 			}
 		}
+	}
+	if field != "" {
+		return field, nil
 	}
 	if err := s.Err(); err != nil {
 		return "", err
